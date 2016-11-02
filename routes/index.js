@@ -181,8 +181,8 @@ router.post('/api/update/:id', function(req, res){
 
    var requestedId = req.param('id');
 
-   var dataToUpdate = {}; // a blank object of data to update
-
+   var dataToUpdate = {}; 
+   
     // pull out the information from the req.body and add it to the object to update
     var title, description; 
 
