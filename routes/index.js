@@ -22,14 +22,70 @@ router.get('/', function(req, res) {
   res.json(jsonData)
 });
 
-// /**
-//  * POST '/api/create'
-//  * Receives a POST request of the new meal, saves to db, responds back
-//  * @param  {Object} req. An object containing the different attributes of the meal
-//  * @return {Object} JSON
-//  */
+/**
+ * GET '/api/meal'
+ * Receives a GET request to get all meal details
+ * @return {Object} JSON
+ */
+router.get('/api/meal', function(req, res){
 
-router.post('/api/create', function(req, res){
+  // mongoose method to find all, see http://mongoosejs.com/docs/api.html#model_Model.find
+  Meal.find(function(err, data){
+    // if err or no meals found, respond with error 
+    if(err || data == null){
+      var error = {status:'ERROR', message: 'Could not find meals'};
+      return res.json(error);
+    }
+
+    // otherwise, respond with the data 
+
+    var jsonData = {
+      status: 'OK',
+      meals: data
+    } 
+
+    res.json(jsonData);
+
+  })
+})
+
+/**
+ * GET '/api/meal/:id'
+ * Receives a GET request specifying the meal to get
+ * @param  {String} req.param('id'). The mealId
+ * @return {Object} JSON
+ */
+router.get('/api/meal/:id', function(req, res){
+
+  var requestedId = req.param('id');
+
+  // mongoose method, see http://mongoosejs.com/docs/api.html#model_Model.findById
+  Meal.findById(requestedId, function(err,data){
+
+    // if err or no user found, respond with error 
+    if(err || data == null){
+      var error = {status:'ERROR', message: 'Could not find that meal'};
+       return res.json(error);
+    }
+
+    // otherwise respond with JSON data of the meal
+    var jsonData = {
+      status: 'OK',
+      meal: data
+    }
+
+    return res.json(jsonData);
+  
+  })
+})
+
+/**
+ * POST '/api/meal'
+ * Receives a POST request of the new meal, saves to db, responds back
+ * @param  {Object} req. An object containing the different attributes of the meal
+ * @return {Object} JSON
+ */
+router.post('/api/meal', function(req, res){
 
     console.log(req.body);
 
@@ -72,112 +128,14 @@ router.post('/api/create', function(req, res){
     })  
 });
 
-// /**
-//  * GET '/api/get/:id'
-//  * Receives a GET request specifying the meal to get
-//  * @param  {String} req.param('id'). The mealId
-//  * @return {Object} JSON
-//  */
-
-router.get('/api/get/:id', function(req, res){
-
-  var requestedId = req.param('id');
-
-  // mongoose method, see http://mongoosejs.com/docs/api.html#model_Model.findById
-  Meal.findById(requestedId, function(err,data){
-
-    // if err or no user found, respond with error 
-    if(err || data == null){
-      var error = {status:'ERROR', message: 'Could not find that meal'};
-       return res.json(error);
-    }
-
-    // otherwise respond with JSON data of the meal
-    var jsonData = {
-      status: 'OK',
-      meal: data
-    }
-
-    return res.json(jsonData);
-  
-  })
-})
-
-// /**
-//  * GET '/api/get'
-//  * Receives a GET request to get all meal details
-//  * @return {Object} JSON
-//  */
-
-router.get('/api/get', function(req, res){
-
-  // mongoose method to find all, see http://mongoosejs.com/docs/api.html#model_Model.find
-  Meal.find(function(err, data){
-    // if err or no meals found, respond with error 
-    if(err || data == null){
-      var error = {status:'ERROR', message: 'Could not find meals'};
-      return res.json(error);
-    }
-
-    // otherwise, respond with the data 
-
-    var jsonData = {
-      status: 'OK',
-      meals: data
-    } 
-
-    res.json(jsonData);
-
-  })
-
-})
-
-// /**
-//  * GET '/api/search'
-//  * Receives a GET request to search for a meal
-//  * @return {Object} JSON
-//  */
-router.get('/api/search', function(req,res){
-
-  // first use req.query to pull out the search query
-  var searchTerm = req.query.title;
-  console.log("we are searching for " + searchTerm);
-
-  // let's find that meal
-  Meal.find({title: searchTerm}, function(err,data){
-    // if err, respond with error 
-    if(err){
-      var error = {status:'ERROR', message: 'Something went wrong'};
-      return res.json(error);
-    }
-
-    //if no meals, respond with no meals message
-    if(data==null || data.length==0){
-      var message = {status:'NO RESULTS', message: 'We couldn\'t find any results'};
-      return res.json(message);      
-    }
-
-    // otherwise, respond with the data 
-
-    var jsonData = {
-      status: 'OK',
-      meals: data
-    } 
-
-    res.json(jsonData);        
-  })
-
-})
-
-// /**
-//  * POST '/api/update/:id'
-//  * Receives a POST request with data of the meal to update, updates db, responds back
-//  * @param  {String} req.param('id'). The mealId to update
-//  * @param  {Object} req. An object containing the different attributes of the meal
-//  * @return {Object} JSON
-//  */
-
-router.post('/api/update/:id', function(req, res){
+/**
+ * POST '/api/meal/:id'
+ * Receives a POST request with data of the meal to update, updates db, responds back
+ * @param  {String} req.param('id'). The mealId to update
+ * @param  {Object} req. An object containing the different attributes of the meal
+ * @return {Object} JSON
+ */
+router.post('/api/meal/:id', function(req, res){
 
    var requestedId = req.param('id');
 
@@ -222,17 +180,15 @@ router.post('/api/update/:id', function(req, res){
       return res.json(jsonData);
 
     })
-
 })
 
 /**
- * GET '/api/delete/:id'
+ * DELETE '/api/post/:id'
  * Receives a GET request specifying the meal to delete
  * @param  {String} req.param('id'). The mealId
  * @return {Object} JSON
  */
-
-router.get('/api/delete/:id', function(req, res){
+router.delete('/api/post/:id', function(req, res){
 
   var requestedId = req.param('id');
 
@@ -251,6 +207,42 @@ router.get('/api/delete/:id', function(req, res){
 
     res.json(jsonData);
 
+  })
+})
+
+/**
+ * GET '/api/search'
+ * Receives a GET request to search for a meal
+ * @return {Object} JSON
+ */
+router.get('/api/search', function(req,res){
+
+  // first use req.query to pull out the search query
+  var searchTerm = req.query.title;
+  console.log("we are searching for " + searchTerm);
+
+  // let's find that meal
+  Meal.find({title: searchTerm}, function(err,data){
+    // if err, respond with error 
+    if(err){
+      var error = {status:'ERROR', message: 'Something went wrong'};
+      return res.json(error);
+    }
+
+    //if no meals, respond with no meals message
+    if(data==null || data.length==0){
+      var message = {status:'NO RESULTS', message: 'We couldn\'t find any results'};
+      return res.json(message);      
+    }
+
+    // otherwise, respond with the data 
+
+    var jsonData = {
+      status: 'OK',
+      meals: data
+    } 
+
+    res.json(jsonData);        
   })
 
 })
